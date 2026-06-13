@@ -9,9 +9,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <span className="font-semibold">ReviewPilot</span>
-          <Link href="/reviews" className="text-sm text-gray-600 hover:text-gray-900">Reviews</Link>
-          <Link href="/responses" className="text-sm text-gray-600 hover:text-gray-900">Responses</Link>
-          <Link href="/settings" className="text-sm text-gray-600 hover:text-gray-900">Settings</Link>
+          <Link href="/reviews" className="text-sm text-gray-600 hover:text-gray-900">Avis</Link>
+          <Link href="/responses" className="text-sm text-gray-600 hover:text-gray-900">Réponses</Link>
+          <Link href="/settings" className="text-sm text-gray-600 hover:text-gray-900">Paramètres</Link>
         </div>
         <UserButton />
       </nav>

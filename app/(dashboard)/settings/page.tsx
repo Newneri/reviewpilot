@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,7 +11,13 @@ function SettingsContent() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const searchParams = useSearchParams()
-  const googleSuccess = searchParams.get('success') === 'connected'
+
+  useEffect(() => {
+    fetch('/api/settings/alert-email')
+      .then(r => r.json())
+      .then(d => { if (d.alertEmail) setAlertEmail(d.alertEmail) })
+  }, [])
+  const googleSuccess = searchParams.get('success') === 'connected' || searchParams.get('success') === 'subscribed'
   const googleError = searchParams.get('error') === 'google_denied'
 
   const saveAlertEmail = async () => {
@@ -32,71 +38,76 @@ function SettingsContent() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan }),
     })
-    const { url } = await res.json()
+    const text = await res.text()
+    if (!res.ok) {
+      alert(`Checkout error: ${text}`)
+      return
+    }
+    const { url } = JSON.parse(text)
     window.location.href = url
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Settings</h1>
+      <h1 className="text-xl font-semibold">Paramètres</h1>
 
       <Card>
         <CardHeader><CardTitle className="text-base">Google Business Profile</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           {googleSuccess && (
             <p className="text-sm text-green-600 bg-green-50 px-3 py-2 rounded">
-              Google account connected successfully.
+              Opération réussie.
             </p>
           )}
           {googleError && (
             <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">
-              Google connection was denied. Please try again.
+              La connexion Google a été refusée. Veuillez réessayer.
             </p>
           )}
           <p className="text-sm text-gray-600">
-            Connect your Google Business Profile to start syncing reviews automatically every hour.
+            Connectez votre Google Business Profile pour synchroniser automatiquement vos avis toutes les heures.
           </p>
           <Button onClick={() => window.location.href = '/api/google/connect'}>
-            Connect Google Account
+            Connecter mon compte Google
           </Button>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Alert Email</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Email d'alerte</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-gray-600">
-            Get notified instantly when a 1-star review arrives.
+            Recevez une alerte immédiate dès qu'un avis 1 étoile est posté.
           </p>
           <div className="flex gap-2">
             <Input
-              placeholder="owner@yourbusiness.com"
+              placeholder="patron@monrestaurant.fr"
               value={alertEmail}
               onChange={e => setAlertEmail(e.target.value)}
               className="max-w-sm"
             />
             <Button onClick={saveAlertEmail} disabled={saving || !alertEmail}>
-              {saved ? 'Saved!' : saving ? 'Saving…' : 'Save'}
+              {saved ? 'Enregistré !' : saving ? 'Enregistrement…' : 'Enregistrer'}
             </Button>
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Subscription</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Abonnement</CardTitle></CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { plan: 'solo', label: 'Solo', price: '$49/mo', desc: '1 location' },
-              { plan: 'business', label: 'Business', price: '$99/mo', desc: '2–5 locations' },
-              { plan: 'agency', label: 'Agency', price: '$299/mo', desc: 'Up to 20 locations' },
+              { plan: 'solo', label: 'Solo', price: '29€/mois', desc: '1 établissement' },
+              { plan: 'business', label: 'Business', price: '69€/mois', desc: 'Jusqu\'à 5 établissements' },
+              { plan: 'agency', label: 'Agency', price: '199€/mois', desc: 'Jusqu\'à 20 établissements' },
             ].map(({ plan, label, price, desc }) => (
               <div key={plan} className="border rounded-xl p-4 text-center">
                 <p className="font-semibold">{label}</p>
                 <p className="text-2xl font-bold my-1">{price}</p>
                 <p className="text-xs text-gray-500 mb-4">{desc}</p>
                 <Button size="sm" className="w-full" onClick={() => subscribe(plan)}>
-                  Subscribe
+                  S'abonner
                 </Button>
               </div>
             ))}

@@ -33,7 +33,7 @@ export function ResponseEditor({ responseId, reviewAuthor, reviewText, rating, d
       if (!res.ok) throw new Error('Failed to save')
       onDone()
     } catch {
-      setError('Failed to save draft. Try again.')
+      setError('Impossible d\'enregistrer le brouillon. Réessayez.')
     } finally {
       setLoading(false)
     }
@@ -52,7 +52,7 @@ export function ResponseEditor({ responseId, reviewAuthor, reviewText, rating, d
       if (!res.ok) throw new Error('Failed to publish')
       onDone()
     } catch {
-      setError('Failed to publish. Check your Google connection in Settings.')
+      setError('Impossible de publier. Vérifiez votre connexion Google dans les Paramètres.')
     } finally {
       setLoading(false)
     }
@@ -65,22 +65,22 @@ export function ResponseEditor({ responseId, reviewAuthor, reviewText, rating, d
           <span className="font-medium">{reviewAuthor}</span>
           <span className={`text-sm ${ratingColor}`}>{stars}</span>
         </div>
-        <p className="text-sm text-gray-600 mt-1">{reviewText ?? '(No text — rating only)'}</p>
+        <p className="text-sm text-gray-600 mt-1">{reviewText ?? '(Aucun texte — note uniquement)'}</p>
       </CardHeader>
       <CardContent className="space-y-3">
         <Textarea
           value={text}
           onChange={e => setText(e.target.value)}
           rows={4}
-          placeholder="Edit the AI response before publishing..."
+          placeholder="Modifiez la réponse IA avant de publier..."
         />
         {error && <p className="text-sm text-red-500">{error}</p>}
         <div className="flex gap-2">
           <Button variant="outline" onClick={approve} disabled={loading}>
-            Save Draft
+            Enregistrer le brouillon
           </Button>
           <Button onClick={publish} disabled={loading}>
-            {loading ? 'Publishing…' : 'Publish to Google'}
+            {loading ? 'Publication…' : 'Publier sur Google'}
           </Button>
         </div>
       </CardContent>

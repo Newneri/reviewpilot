@@ -22,17 +22,17 @@ export default function ReviewsPage() {
   }, [])
 
   if (loading) {
-    return <p className="text-gray-400 text-sm">Loading reviews…</p>
+    return <p className="text-gray-400 text-sm">Chargement des avis…</p>
   }
 
   if (!reviews.length) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-500 font-medium mb-1">No reviews yet</p>
+        <p className="text-gray-500 font-medium mb-1">Aucun avis pour l'instant</p>
         <p className="text-sm text-gray-400">
-          Connect your Google Business Profile in{' '}
-          <a href="/settings" className="text-blue-500 underline">Settings</a>{' '}
-          to start syncing.
+          Connectez votre Google Business Profile dans les{' '}
+          <a href="/settings" className="text-blue-500 underline">Paramètres</a>{' '}
+          pour démarrer la synchronisation.
         </p>
       </div>
     )
@@ -40,7 +40,7 @@ export default function ReviewsPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold mb-6">Reviews</h1>
+      <h1 className="text-xl font-semibold mb-6">Avis</h1>
       <div className="space-y-4">
         {reviews.map(r => <ReviewCard key={r.id} review={r} />)}
       </div>
