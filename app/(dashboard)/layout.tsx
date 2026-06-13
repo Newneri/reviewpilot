@@ -1,7 +1,9 @@
 import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
+import { getDbUser } from '@/lib/auth'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  await getDbUser()
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
