@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String        @id @default(cuid())
+  clerkId      String        @unique
+  email        String
+  businesses   Business[]
+  subscription Subscription?
+  createdAt    DateTime      @default(now())
+}
+
+model Business {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  googleLocationId String?
+  googleAccountId  String?
+  accessToken      String?
+  refreshToken     String?
+  tokenExpiresAt   DateTime?
+  toneExamples     String?
+  autoPublish      Boolean   @default(false)
+  alertEmail       String?
+  reviews          Review[]
+  createdAt        DateTime  @default(now())
+}
+
+model Review {
+  id             String    @id @default(cuid())
+  businessId     String
+  business       Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  googleReviewId String    @unique
+  authorName     String
+  rating         Int
+  text           String?
+  publishedAt    DateTime
+  response       Response?
+  alertSent      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+}
+
+model Response {
+  id          String    @id @default(cuid())
+  reviewId    String    @unique
+  review      Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  text        String
+  status      String    @default("draft")
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId String   @unique
+  stripePriceId    String
+  stripeSubId      String   @unique
+  status           String
+  plan             String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
