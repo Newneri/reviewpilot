@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 type AlertParams = {
   toEmail: string
   businessName: string
@@ -14,6 +12,7 @@ type AlertParams = {
 export async function sendLowRatingAlert(params: AlertParams): Promise<void> {
   if (params.rating > 1) return
 
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const { toEmail, businessName, authorName, rating, reviewText, reviewId } = params
 
   await resend.emails.send({

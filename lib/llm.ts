@@ -1,7 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
 type GenerateParams = {
   authorName: string
   rating: number
@@ -11,6 +9,7 @@ type GenerateParams = {
 }
 
 export async function generateResponse(params: GenerateParams): Promise<string> {
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const { authorName, rating, text, businessName, toneExamples } = params
   const toneSection = toneExamples ? `\n\nTone examples from this business:\n${toneExamples}` : ''
 
@@ -32,6 +31,7 @@ Write 2-4 sentences. Be genuine, address the customer by name. Output ONLY the r
 }
 
 export async function extractToneProfile(examples: string[]): Promise<string> {
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const prompt = `Analyze these review responses and return ONLY a JSON object with keys: style (string), formality ("formal"|"casual"), emoji_usage (boolean), signature (string|null).
 
 Examples:
