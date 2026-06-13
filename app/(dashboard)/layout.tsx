@@ -1,9 +1,22 @@
 import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { getDbUser } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { SubscribeGate } from '@/components/SubscribeGate'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  await getDbUser()
+  const user = await getDbUser()
+
+  const sub = user
+    ? await db.subscription.findUnique({ where: { userId: user.id } })
+    : null
+
+  const hasActivePlan = sub?.status === 'active'
+
+  if (!hasActivePlan) {
+    return <SubscribeGate />
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b px-6 py-3 flex items-center justify-between">
