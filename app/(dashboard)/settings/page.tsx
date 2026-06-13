@@ -10,12 +10,16 @@ function SettingsContent() {
   const [alertEmail, setAlertEmail] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null)
   const searchParams = useSearchParams()
 
   useEffect(() => {
     fetch('/api/settings/alert-email')
       .then(r => r.json())
       .then(d => { if (d.alertEmail) setAlertEmail(d.alertEmail) })
+    fetch('/api/settings/subscription')
+      .then(r => r.json())
+      .then(d => { if (d.status === 'active') setCurrentPlan(d.plan) })
   }, [])
   const googleSuccess = searchParams.get('success') === 'connected' || searchParams.get('success') === 'subscribed'
   const googleError = searchParams.get('error') === 'google_denied'
@@ -96,18 +100,28 @@ function SettingsContent() {
       <Card>
         <CardHeader><CardTitle className="text-base">Abonnement</CardTitle></CardHeader>
         <CardContent>
+          {currentPlan && (
+            <p className="text-sm text-green-600 bg-green-50 px-3 py-2 rounded mb-4">
+              Abonnement actif : <span className="font-semibold capitalize">{currentPlan}</span>
+            </p>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { plan: 'solo', label: 'Solo', price: '29€/mois', desc: '1 établissement' },
               { plan: 'business', label: 'Business', price: '69€/mois', desc: 'Jusqu\'à 5 établissements' },
               { plan: 'agency', label: 'Agency', price: '199€/mois', desc: 'Jusqu\'à 20 établissements' },
             ].map(({ plan, label, price, desc }) => (
-              <div key={plan} className="border rounded-xl p-4 text-center">
+              <div key={plan} className={`border rounded-xl p-4 text-center ${currentPlan === plan ? 'border-black bg-gray-50' : ''}`}>
                 <p className="font-semibold">{label}</p>
                 <p className="text-2xl font-bold my-1">{price}</p>
                 <p className="text-xs text-gray-500 mb-4">{desc}</p>
-                <Button size="sm" className="w-full" onClick={() => subscribe(plan)}>
-                  S'abonner
+                <Button
+                  size="sm"
+                  className="w-full"
+                  onClick={() => subscribe(plan)}
+                  disabled={currentPlan === plan}
+                >
+                  {currentPlan === plan ? 'Plan actuel' : 'S\'abonner'}
                 </Button>
               </div>
             ))}
