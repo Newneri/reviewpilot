@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { ResponseEditor } from '@/components/ResponseEditor'
+import { useLocation } from '@/contexts/LocationContext'
 
 type Response = {
   id: string
@@ -13,17 +14,22 @@ type Response = {
 }
 
 export default function ResponsesPage() {
+  const { selectedId, locations } = useLocation()
   const [responses, setResponses] = useState<Response[]>([])
   const [loading, setLoading] = useState(true)
 
   const load = () => {
     setLoading(true)
-    fetch('/api/responses')
+    const url = selectedId ? `/api/responses?b=${selectedId}` : '/api/responses'
+    fetch(url)
       .then(r => r.json())
       .then(d => { setResponses(d.responses ?? []); setLoading(false) })
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    if (selectedId === null && locations.length > 0) return
+    load()
+  }, [selectedId, locations.length])
 
   if (loading) {
     return <p className="text-gray-400 text-sm">Chargement des réponses…</p>

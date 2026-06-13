@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { ReviewCard } from '@/components/ReviewCard'
+import { useLocation } from '@/contexts/LocationContext'
 
 type Review = {
   id: string
@@ -12,14 +13,18 @@ type Review = {
 }
 
 export default function ReviewsPage() {
+  const { selectedId, locations } = useLocation()
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/reviews')
+    if (selectedId === null && locations.length > 0) return
+    setLoading(true)
+    const url = selectedId ? `/api/reviews?b=${selectedId}` : '/api/reviews'
+    fetch(url)
       .then(r => r.json())
       .then(d => { setReviews(d.reviews ?? []); setLoading(false) })
-  }, [])
+  }, [selectedId, locations.length])
 
   if (loading) {
     return <p className="text-gray-400 text-sm">Chargement des avis…</p>
@@ -31,7 +36,7 @@ export default function ReviewsPage() {
         <p className="text-gray-500 font-medium mb-1">Aucun avis pour l'instant</p>
         <p className="text-sm text-gray-400">
           Connectez votre Google Business Profile dans les{' '}
-          <a href="/settings" className="text-blue-500 underline">Paramètres</a>{' '}
+          <a href="/locations" className="text-blue-500 underline">Établissements</a>{' '}
           pour démarrer la synchronisation.
         </p>
       </div>

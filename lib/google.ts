@@ -55,6 +55,32 @@ export async function refreshAccessToken(refreshToken: string) {
   }
 }
 
+export async function listAccounts(accessToken: string) {
+  const res = await fetch('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!res.ok) throw new Error('Failed to list accounts')
+  const data = await res.json()
+  return (data.accounts ?? []).map((a: { name: string; accountName: string }) => ({
+    id: a.name.split('/')[1],
+    name: a.accountName,
+  }))
+}
+
+export async function listLocations(accountId: string, accessToken: string) {
+  const res = await fetch(
+    `https://mybusinessbusinessinformation.googleapis.com/v1/accounts/${accountId}/locations?readMask=name,title`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  )
+  if (!res.ok) return []
+  const data = await res.json()
+  return (data.locations ?? []).map((l: { name: string; title: string }) => ({
+    id: l.name.split('/').pop() as string,
+    accountId,
+    name: l.title ?? 'Établissement sans nom',
+  }))
+}
+
 export type RawReview = {
   googleReviewId: string
   authorName: string

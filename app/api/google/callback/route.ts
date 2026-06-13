@@ -36,5 +36,5 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/settings?success=connected`)
+  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/locations`)
 }

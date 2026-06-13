@@ -1,12 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getDbUser } from '@/lib/auth'
 import { db } from '@/lib/db'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const user = await getDbUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const business = await db.business.findFirst({ where: { userId: user.id } })
+  const b = req.nextUrl.searchParams.get('b')
+  const business = await db.business.findFirst({
+    where: b
+      ? { id: b, userId: user.id }
+      : { userId: user.id, googleLocationId: { not: null } },
+  })
   if (!business) return NextResponse.json({ responses: [] })
 
   const responses = await db.response.findMany({
